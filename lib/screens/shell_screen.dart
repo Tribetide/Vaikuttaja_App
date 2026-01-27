@@ -4,6 +4,10 @@ import 'base_screen.dart';
 // import 'add_influencer_screen.dart';
 import 'profile_screen.dart';
 import 'home_screen.dart';
+import 'chat_list_screen.dart';
+import 'events_list_screen.dart';
+
+
 
 // NOTE:
 // ShellScreen = sovelluksen “kuori” / runkonäkymä kirjautumisen jälkeen.
@@ -41,12 +45,10 @@ class _ShellScreenState extends State<ShellScreen> {
       (title: 'Feed', child: const HomeScreen()),
 
       // Events-välilehti: placeholder (rakennetaan myöhemmin).
-      // Todo: korvaa oikealla sisällöllä myöhemmin.
-      (title: 'Events', child: const Center(child: Text('Events content'))),
+      (title: 'Events', child: const EventsListScreen()),
 
       // Chat-välilehti: placeholder (rakennetaan myöhemmin).
-      // Todo: tee ChatListScreen / ConversationsScreen ja korvaa tämä.
-      (title: 'Chat', child: const Center(child: Text('Chat content'))),
+      (title: 'Chat', child: const ChatListScreen()),
 
       // Profiili-välilehti: vaikuttajan oma profiili “muiden silmin”.
       // ProfileScreen näyttää korttipohjaisen mediakortin.
