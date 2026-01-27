@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
-import '../theme/app_theme_theme.dart';
 
+/// ChatThreadScreen = yksittäinen keskustelu.
+///
+/// MVP:
+/// - paikallinen viestilista (ei backendia)
+/// - viestin lähetys lisää viestin listaan
+///
+/// todo:
+/// - kytke viestit backend/streamiin
+/// - lisää typing/seen/statusit tarvittaessa
 class ChatThreadScreen extends StatefulWidget {
   const ChatThreadScreen({
     super.key,
@@ -16,14 +24,12 @@ class ChatThreadScreen extends StatefulWidget {
 class _ChatThreadScreenState extends State<ChatThreadScreen> {
   final _controller = TextEditingController();
 
-  // mvp: viestit paikallisena listana
+  // MVP: viestit paikallisena listana
   // todo: korvaa backend/stream -viesteillä
   final List<_ChatMessage> _messages = [
     _ChatMessage(text: 'Moikka! Kiinnostaisiko yhteistyö?', isMe: false, time: '12:39'),
     _ChatMessage(text: 'Moikka! Kerro lisää 👋', isMe: true, time: '12:40'),
   ];
-
-  Color _alpha(Color c, double opacity) => c.withAlpha((opacity * 255).round());
 
   @override
   void dispose() {
@@ -42,18 +48,16 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     _controller.clear();
 
     // todo: backendissä tässä kohtaa lähetetään viesti palvelimelle
-    // todo: voi lisätä myös “auto reply” -mockin jos haluatte demo-fiiliksen
   }
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      // AppBarTheme tulee teemasta
       appBar: AppBar(
         title: Text(widget.chatTitle),
-        backgroundColor: AppColors.secondary,
-        foregroundColor: AppColors.textPrimary,
-        elevation: 1,
       ),
       body: Column(
         children: [
@@ -63,40 +67,10 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               itemCount: _messages.length,
               itemBuilder: (context, i) {
                 final m = _messages[i];
-                return Align(
-                  alignment: m.isMe ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    constraints: const BoxConstraints(maxWidth: 320),
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: m.isMe
-                          ? _alpha(AppColors.primary, 0.18)
-                          : _alpha(AppColors.surface, 0.95),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: _alpha(AppColors.primary, 0.10)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment:
-                          m.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          m.text,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(color: AppColors.textPrimary),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          m.time,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: _alpha(AppColors.textPrimary, 0.60),
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
+                return _MessageBubble(
+                  message: m,
+                  bubbleColor: m.isMe ? cs.primary.withAlpha(35) : cs.surface,
+                  borderColor: cs.primary.withAlpha(25),
                 );
               },
             ),
@@ -106,10 +80,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           Container(
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
             decoration: BoxDecoration(
-              color: AppColors.surface,
-              border: Border(
-                top: BorderSide(color: _alpha(AppColors.primary, 0.10)),
-              ),
+              color: cs.surface,
+              border: Border(top: BorderSide(color: cs.primary.withAlpha(20))),
             ),
             child: Row(
               children: [
@@ -120,34 +92,60 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                     maxLines: 4,
                     textInputAction: TextInputAction.send,
                     onSubmitted: (_) => _send(),
-                    decoration: InputDecoration(
+                    // InputDecorationTheme hoitaa borderit/fillit
+                    decoration: const InputDecoration(
                       hintText: 'Kirjoita viesti…',
-                      filled: true,
-                      fillColor: _alpha(AppColors.secondary, 0.25),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(color: _alpha(AppColors.primary, 0.10)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(color: _alpha(AppColors.primary, 0.10)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(color: _alpha(AppColors.primary, 0.35)),
-                      ),
                     ),
                   ),
                 ),
                 const SizedBox(width: 10),
                 IconButton(
                   onPressed: _send,
-                  icon: Icon(Icons.send, color: AppColors.primary),
+                  icon: const Icon(Icons.send),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _MessageBubble extends StatelessWidget {
+  const _MessageBubble({
+    required this.message,
+    required this.bubbleColor,
+    required this.borderColor,
+  });
+
+  final _ChatMessage message;
+  final Color bubbleColor;
+  final Color borderColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Align(
+      alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 320),
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: bubbleColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: borderColor),
+        ),
+        child: Column(
+          crossAxisAlignment: message.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
+            Text(message.text, style: textTheme.bodyMedium),
+            const SizedBox(height: 4),
+            Text(message.time, style: textTheme.bodySmall),
+          ],
+        ),
       ),
     );
   }

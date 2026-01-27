@@ -1,49 +1,41 @@
 import 'package:flutter/material.dart';
-import '../theme/app_theme_theme.dart';
 
-// BaseScreen = yhteinen “kehys” kaikille kirjautumisen jälkeisille näkymille.
-//
-// Miksi tämä on olemassa?
-// - Halutaan yksi yhtenäinen paikka, joka piirtää yläbannerin (otsikko + actionit)
-// - Halutaan yhdenmukainen padding / taustaväri / layout kaikille sisällöille
-// - ShellScreen voi vaihtaa vain title + child + actions, eikä jokaisen tabin
-//   tarvitse rakentaa headeria itse.
-//
-// Käyttö:
-// BaseScreen(
-//   title: "Feed",
-//   actions: [IconButton(...)],
-//   child: HomeScreen(),
-// )
-
+/// BaseScreen = yhteinen kehys ShellScreenin välilehdille.
+///
+/// Vastuut:
+/// - piirtää yläbannerin (otsikko + actions)
+/// - tarjoaa yhtenäisen paddingin sisällölle
+/// - pitää taustan yhtenäisenä (ei valkoisia pintoja)
 class BaseScreen extends StatelessWidget {
   const BaseScreen({
     super.key,
     required this.title,
     required this.child,
     this.actions = const [],
+    this.padding = const EdgeInsets.all(16),
   });
 
-  // Bannerissa näytettävä otsikko (esim. "Feed", "Chat", "Oma mediakortti")
   final String title;
-  // Varsinainen näkymän sisältö, joka tulee bannerin alle.
   final Widget child;
-  // Oikean reunan toimintopainikkeet (esim. “Muokkaa”, “Lisää”, asetukset...).
-  // Oletus = ei actioneita.
   final List<Widget> actions;
 
-  // Yksi paikka muuttaa bannerin mittoja/tyyliä
+  /// Sisällön padding. MVP:ssä 16 toimii hyvin.
+  /// todo: jos haluat “ei reunoja” myös sisällöissä, vaihda EdgeInsets.zero.
+  final EdgeInsetsGeometry padding;
+
   static const double headerHeight = 68;
 
   @override
   Widget build(BuildContext context) {
-    // Column: yläbanneri + alla sisältö (Expanded täyttää lopun tilan).
+    final cs = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Column(
       children: [
         // Header / banneri
         Material(
-          elevation: 1, // kevyt varjo (vaihda tähän jos haluat)
-          color: AppColors.secondary,
+          elevation: 1,
+          color: cs.secondary,
           child: SizedBox(
             height: headerHeight,
             width: double.infinity,
@@ -54,7 +46,7 @@ class BaseScreen extends StatelessWidget {
                   Expanded(
                     child: Text(
                       title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColors.textPrimary),
+                      style: textTheme.titleMedium,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -65,11 +57,11 @@ class BaseScreen extends StatelessWidget {
           ),
         ),
 
-        // Sisältö
+        // Sisältöalue: sama tausta kuin koko sovelluksessa (ei valkoista)
         Expanded(
           child: Container(
-            color: AppColors.surface,
-            padding: const EdgeInsets.all(16),
+            color: Theme.of(context).scaffoldBackgroundColor,
+            padding: padding,
             child: child,
           ),
         ),

@@ -1,78 +1,154 @@
 import 'package:flutter/material.dart';
+import '../models/influencer.dart';
 
-// ProfileScreen = vaikuttajan oma profiili “muiden silmin” (mediakortti).
-//
-// Tämän ruudun idea:
-// - EI ole muokkauslomake.
-// - Tämä on katselunäkymä: selkeä, korttipohjainen tarina vaikuttajasta.
-// - Sisältö jaetaan pieniin ProfileCard-osioihin (helppo lukea + helppo laajentaa).
-//
-// Todo (seuraavat stepit, suositeltu järjestys):
-// 1) Tee uudelleenkäytettävä widget: ProfileCard (widgets/profile_card.dart)
-//    - otsikko + sisältö + yhtenäinen padding + reunat/varjo
-// 2) Lisää perusinfo-kortti:
-//    - profiilikuva, nimi, paikkakunta, slogan/tagline
-// 3) Lisää “Minä sisällöntuottajana” -kortti:
-//    - lyhyt kuvaus (tone, niche, arvot)
-// 4) Lisää kanavakortit (Instagram/TikTok/...):
-//    - seuraajat, engagement (myöhemmin), kohderyhmä
-// 5) Lisää yhteistyöpreferenssit + paketit:
-//    - mitä tekee / mitä ei tee, hinnat (myöhemmin), toimitusajat
-// 6) Lisää portfolio-grid (kuvat/videot) placeholderina
-// 7) Lisää “Muokkaa”-toiminto headeriin (BaseScreen actions):
-//    - ohjaa EditInfluencerScreen/AddInfluencerScreen -lomakkeeseen
-// 8) Kun Influencer-malli on käytössä:
-//    - ProfileScreen ottaa Influencer-olion (tai hakee sen providerista)
-//    - kaikki tekstit/datat tulevat yhdestä lähteestä (single source of truth)
-
+/// ProfileScreen = vaikuttajan mediakortti (katselunäkymä).
+///
+/// MVP:
+/// - näyttää Influencer-datan (jos annettu), muuten fallback-testidataa
+/// - osiot kortteina (teema hoitaa ulkoasun)
+///
+/// todo:
+/// - lisää lisää osioita (yleisödata, paketit, portfolio)
+/// - kun backend tulee: data provider/repo -> ei tarvitse välittää suoraan Shellistä
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({
+    super.key,
+    this.influencer,
+  });
+
+  final Influencer? influencer;
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    // MVP: jos Shell ei vielä välitä oikeaa dataa, käytetään fallbackia
+    final i = influencer ??
+        Influencer(
+          id: 'test-user-id',
+          name: 'Nimi / Nimimerkki',
+          platform: 'Instagram',
+          followers: 58000,
+          price: 0,
+          imageUrl: '',
+        );
 
-    // SingleChildScrollView:
-    // - profiili on usein pitkä (monta korttia)
-    // - siksi scrollattava kokonaisuus on luonteva
-    //
-    // Todo:
-    // Kun kortteja tulee paljon ja sisältö monimutkaistuu:
-    // - harkitse CustomScrollView + SliverList/SliverToBoxAdapter
-    //   (parempi suorituskyky + joustavammat “section headerit”)
+    const location = 'Seinäjoki'; // todo: tulee user-profiilista myöhemmin
 
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1) Profiiliheader (vain tämä pala)
-          Row(
+          _HeaderCard(
+            name: i.name,
+            location: location,
+            primaryPlatform: i.platform,
+            followers: i.followers,
+          ),
+          const SizedBox(height: 12),
+
+          const _SectionCard(
+            title: 'Minä sisällöntuottajana',
+            child: Text('Tekstiä minusta'),
+          ),
+          const SizedBox(height: 12),
+
+          _SectionCard(
+            title: 'Pääkanava',
+            child: Text('${i.platform} • ${i.followers} seuraajaa'),
+          ),
+          const SizedBox(height: 12),
+
+          const _SectionCard(
+            title: 'Portfolio',
+            child: Text('todo: kuvat/videot myöhemmin'),
+          ),
+          const SizedBox(height: 12),
+
+          // todo: lisää myöhemmin samalla pohjalla:
+          // - yleisö & statistiikka
+          // - yhteistyöpreferenssit & paketit
+        ],
+      ),
+    );
+  }
+}
+
+class _HeaderCard extends StatelessWidget {
+  const _HeaderCard({
+    required this.name,
+    required this.location,
+    required this.primaryPlatform,
+    required this.followers,
+  });
+
+  final String name;
+  final String location;
+  final String primaryPlatform;
+  final int followers;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
             children: [
               const CircleAvatar(
-                radius: 40,
-                child: Icon(Icons.person, size: 40),
+                radius: 26,
+                child: Icon(Icons.person_outline),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Nimi / Nimimerkki', style: textTheme.titleLarge),
+                    Text(name, style: Theme.of(context).textTheme.titleLarge),
                     const SizedBox(height: 4),
-                    Text('Seinäjoki', style: textTheme.bodyMedium),
+                    Text(location, style: Theme.of(context).textTheme.bodyMedium),
+                    const SizedBox(height: 8),
+                    Text(
+                      '$primaryPlatform • $followers seuraajaa',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                   ],
                 ),
               ),
             ],
           ),
-          // Todo (seuraava konkreettinen lisäys tänne alle):
-          // Lisää SizedBox(height: 16) ja ensimmäinen ProfileCard:
-          // - "Minä sisällöntuottajana"
-          // - "Kanavat"
-          // - "Yleisö & statistiikka"
-          // - "Yhteistyöpaketit"
-          // - "Portfolio"
-        ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionCard extends StatelessWidget {
+  const _SectionCard({
+    required this.title,
+    required this.child,
+  });
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: textTheme.titleMedium),
+              const SizedBox(height: 10),
+              child,
+            ],
+          ),
+        ),
       ),
     );
   }
