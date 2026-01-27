@@ -18,3 +18,9 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+// Sovelluksen käynnistyspiste
+// Tässä määritellään pääasiallinen teema ja aloitusnäyttö
+// Käytetään MaterialAppia, joka on Flutterin tarjoama widget
+// sovelluksen perusrakenteen luomiseen
+// AppTheme.lightTheme määrittelee sovelluksen ulkoasun 

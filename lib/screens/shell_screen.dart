@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme_theme.dart';
 import 'base_screen.dart';
+// import 'add_influencer_screen.dart';
+import 'profile_screen.dart';
+import 'home_screen.dart';
+
+
 
 class ShellScreen extends StatefulWidget {
   const ShellScreen({super.key});
@@ -15,10 +20,10 @@ class _ShellScreenState extends State<ShellScreen> {
   @override
   Widget build(BuildContext context) {
     final pages = <({String title, Widget child})>[
-      (title: 'Feed', child: const Center(child: Text('Feed content'))),
+      (title: 'Feed', child: const HomeScreen()),
       (title: 'Events', child: const Center(child: Text('Events content'))),
       (title: 'Chat', child: const Center(child: Text('Chat content'))),
-      (title: 'Oma mediakortti', child: const Center(child: Text('Profile content'))),
+      (title: 'Oma mediakortti', child:const ProfileScreen()),
     ];
 
     return Scaffold(
