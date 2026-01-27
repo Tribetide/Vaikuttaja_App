@@ -1,6 +1,21 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme_theme.dart';
 
+// BaseScreen = yhteinen “kehys” kaikille kirjautumisen jälkeisille näkymille.
+//
+// Miksi tämä on olemassa?
+// - Halutaan yksi yhtenäinen paikka, joka piirtää yläbannerin (otsikko + actionit)
+// - Halutaan yhdenmukainen padding / taustaväri / layout kaikille sisällöille
+// - ShellScreen voi vaihtaa vain title + child + actions, eikä jokaisen tabin
+//   tarvitse rakentaa headeria itse.
+//
+// Käyttö:
+// BaseScreen(
+//   title: "Feed",
+//   actions: [IconButton(...)],
+//   child: HomeScreen(),
+// )
+
 class BaseScreen extends StatelessWidget {
   const BaseScreen({
     super.key,
@@ -9,8 +24,12 @@ class BaseScreen extends StatelessWidget {
     this.actions = const [],
   });
 
+  // Bannerissa näytettävä otsikko (esim. "Feed", "Chat", "Oma mediakortti")
   final String title;
+  // Varsinainen näkymän sisältö, joka tulee bannerin alle.
   final Widget child;
+  // Oikean reunan toimintopainikkeet (esim. “Muokkaa”, “Lisää”, asetukset...).
+  // Oletus = ei actioneita.
   final List<Widget> actions;
 
   // Yksi paikka muuttaa bannerin mittoja/tyyliä
@@ -18,6 +37,7 @@ class BaseScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Column: yläbanneri + alla sisältö (Expanded täyttää lopun tilan).
     return Column(
       children: [
         // Header / banneri
