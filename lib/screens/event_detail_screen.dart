@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
-import 'events_list_screen.dart';
+import '../models/event.dart';
 
-/// EventDetailScreen = yksittäisen tapahtuman tarkempi näkymä.
+/// EventDetailScreen = tapahtuman tarkempi näkymä.
 ///
 /// MVP:
-/// - näyttää perustiedot (otsikko, yritys, aika, paikka, kuvaus)
-/// - “Ota yhteyttä” -nappi placeholderina
-///
-/// todo:
-/// - lisää pidempi kuvaus, mahdolliset linkit ja ilmoittautuminen
-/// - “Ota yhteyttä” -> avaa chat yritykseen (kun yritys/roolit kytketään)
+/// - vaikuttaja: voi “Osallistua” -> palautetaan päivitetty EventItem (id lisätty listaan)
+/// - yritys: pelkkä katselu (muokkaus hoidetaan listan kynästä)
 class EventDetailScreen extends StatelessWidget {
-  const EventDetailScreen({super.key, required this.event});
+  const EventDetailScreen({
+    super.key,
+    required this.event,
+    required this.isCompanyView,
+    required this.influencerId,
+  });
 
   final EventItem event;
+  final bool isCompanyView;
+
+  /// MVP: kuka “osallistuu”
+  final String influencerId;
 
   @override
   Widget build(BuildContext context) {
+    final alreadyJoined = event.participantInfluencerIds.contains(influencerId);
+
     return Scaffold(
-      // AppBar ja tausta tulevat teemasta (AppBarTheme + scaffoldBackgroundColor)
       appBar: AppBar(
         title: const Text('Tapahtuma'),
       ),
@@ -32,16 +38,18 @@ class EventDetailScreen extends StatelessWidget {
               children: [
                 Text(event.title, style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 6),
-                Text(event.company, style: Theme.of(context).textTheme.bodyMedium),
+
+                Text(
+                  event.companyName,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 const SizedBox(height: 14),
 
                 Row(
                   children: [
                     const Icon(Icons.event_outlined, size: 18),
                     const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(event.dateLabel, style: Theme.of(context).textTheme.bodyMedium),
-                    ),
+                    Text(event.dateLabel, style: Theme.of(context).textTheme.bodyMedium),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -49,32 +57,66 @@ class EventDetailScreen extends StatelessWidget {
                   children: [
                     const Icon(Icons.place_outlined, size: 18),
                     const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(event.location, style: Theme.of(context).textTheme.bodyMedium),
-                    ),
+                    Text(event.location, style: Theme.of(context).textTheme.bodyMedium),
                   ],
                 ),
 
                 const SizedBox(height: 14),
 
                 Text(event.shortDescription, style: Theme.of(context).textTheme.bodyMedium),
+                const SizedBox(height: 12),
+
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: event.tags.map((t) => Chip(label: Text(t))).toList(),
+                ),
 
                 const Spacer(),
 
-                // MVP: placeholder-toiminto
-                // todo: backendissä -> avaa chat / ilmoittaudu / ota yhteyttä
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('mvp: toiminto lisätään myöhemmin')),
-                      );
-                    },
-                    icon: const Icon(Icons.chat_bubble_outline),
-                    label: const Text('Ota yhteyttä'),
+                if (!isCompanyView)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: alreadyJoined
+                          ? null
+                          : () {
+                              // MVP: lisätään influencerId listaan ja palautetaan päivitetty event
+                              final updated = EventItem(
+                                id: event.id,
+                                companyId: event.companyId,
+                                companyName: event.companyName,
+                                title: event.title,
+                                dateLabel: event.dateLabel,
+                                location: event.location,
+                                shortDescription: event.shortDescription,
+                                tags: event.tags,
+                                isPublished: event.isPublished,
+                                participantInfluencerIds: [
+                                  ...event.participantInfluencerIds,
+                                  influencerId,
+                                ],
+                              );
+
+                              Navigator.pop(context, updated);
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Osallistuminen tallennettu (mvp)')),
+                              );
+                            },
+                      icon: const Icon(Icons.how_to_reg_outlined),
+                      label: Text(alreadyJoined ? 'Osallistut jo' : 'Osallistu'),
+                    ),
+                  )
+                else
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: null,
+                      icon: const Icon(Icons.info_outline),
+                      label: const Text('Yritysnäkymä: muokkaus kynästä'),
+                    ),
                   ),
-                ),
               ],
             ),
           ),

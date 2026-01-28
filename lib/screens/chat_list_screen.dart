@@ -1,21 +1,39 @@
 import 'package:flutter/material.dart';
 import 'chat_thread_screen.dart';
 
-/// ChatListScreen = keskustelulista.
+/// ChatListScreen = keskustelulista (sama layout molemmille rooleille).
 ///
-/// MVP:
-/// - kovakoodattu lista (ei backendia)
-/// - avaa ChatThreadScreenin painamalla listaa
+/// MVP-roolilogiikka:
+/// - jos isCompanyView == true: näytetään vaikuttaja-keskustelut (yritys keskustelee vaikuttajien kanssa)
+/// - jos isCompanyView == false: näytetään yritys-keskustelut (vaikuttaja keskustelee yritysten kanssa)
 ///
-/// todo:
-/// - hae keskustelut backendistä
-/// - näytä unread-tila / viimeisin aika oikeasti / profiilikuva yritykselle
+/// todo (backend):
+/// - korvaa mock-data keskustelulistalla (viimeisin viesti, unread, threadId...)
 class ChatListScreen extends StatelessWidget {
-  const ChatListScreen({super.key});
+  const ChatListScreen({
+    super.key,
+    required this.isCompanyView,
+  });
 
-  // MVP: testidata suoraan tässä tiedostossa
-  // todo: korvaa backendistä tulevalla keskustelulistalla
-  static const _mockChats = [
+  /// true = yritysnäkymä, false = vaikuttajanäkymä
+  final bool isCompanyView;
+
+  // MVP: mock-keskustelut yritykselle (eli yritys keskustelee vaikuttajien kanssa)
+  static const _companyChats = [
+    (
+      name: 'Mimosa',
+      lastMessage: 'Moikka! Kiinnostaisiko yhteistyö?',
+      time: '12:40',
+    ),
+    (
+      name: 'Test Influencer',
+      lastMessage: 'Voisin tehdä UGC-videon tästä tuotteesta.',
+      time: 'Eilen',
+    ),
+  ];
+
+  // MVP: mock-keskustelut vaikuttajalle (eli vaikuttaja keskustelee yritysten kanssa)
+  static const _influencerChats = [
     (
       name: 'Yritys Oy',
       lastMessage: 'Moikka! Kiinnostaisiko yhteistyö?',
@@ -30,37 +48,47 @@ class ChatListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final chats = isCompanyView ? _companyChats : _influencerChats;
+    final dividerColor = Theme.of(context).dividerTheme.color;
 
     return ListView.separated(
       padding: EdgeInsets.zero,
-      itemCount: _mockChats.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      itemCount: chats.length,
+      separatorBuilder: (_, __) => Divider(
+        height: 1,
+        color: dividerColor,
+      ),
       itemBuilder: (context, i) {
-        final c = _mockChats[i];
+        final c = chats[i];
 
-        return Card(
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: cs.secondary,
-              child: const Icon(Icons.chat_bubble_outline),
+        return ListTile(
+          leading: CircleAvatar(
+            child: Icon(
+              isCompanyView ? Icons.person_outline : Icons.apartment_outlined,
             ),
-            title: Text(c.name),
-            subtitle: Text(
-              c.lastMessage,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            trailing: Text(c.time),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ChatThreadScreen(chatTitle: c.name),
-                ),
-              );
-            },
           ),
+          title: Text(
+            c.name,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          subtitle: Text(
+            c.lastMessage,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          trailing: Text(
+            c.time,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ChatThreadScreen(chatTitle: c.name),
+              ),
+            );
+          },
         );
       },
     );
