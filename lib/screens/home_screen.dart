@@ -75,7 +75,7 @@ class HomeScreen extends StatelessWidget {
     return ListView.separated(
       padding: EdgeInsets.zero, // BaseScreen hoitaa paddingin
       itemCount: items.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (context, index) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         if (isCompanyView) {
           final influencer = items[index] as Influencer;

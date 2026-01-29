@@ -167,7 +167,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
             child: ListView.separated(
               padding: EdgeInsets.zero, // BaseScreen hoitaa paddingin
               itemCount: events.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, i) {
                 final e = events[i];
 
