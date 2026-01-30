@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+// UUSI
+import '../widgets/app_scaffold.dart';
+
 /// ChatThreadScreen = yksittäinen keskustelu.
 ///
 /// MVP:
@@ -54,11 +57,9 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      // AppBarTheme tulee teemasta
-      appBar: AppBar(
-        title: Text(widget.chatTitle),
-      ),
+    return AppScaffold(
+      title: widget.chatTitle,
+      padding: EdgeInsets.zero, // koska sisällä on omat paddings
       body: Column(
         children: [
           Expanded(

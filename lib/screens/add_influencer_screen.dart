@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/influencer.dart';
 
+// UUSI
+import '../widgets/app_scaffold.dart';
+
 /// AddInfluencerScreen = mediakortin (Influencer) rakentaja.
 ///
 /// Rajaus (mvp):
@@ -104,10 +107,9 @@ class _AddInfluencerScreenState extends State<AddInfluencerScreen> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_initialInfluencer == null ? 'Muokkaa profiilia' : 'Muokkaa profiilia'),
-      ),
+    return AppScaffold(
+      title: 'Muokkaa profiilia',
+      padding: EdgeInsets.zero,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(

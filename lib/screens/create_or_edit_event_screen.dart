@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/event.dart';
 
+// UUSI
+import '../widgets/app_scaffold.dart';
+
 /// CreateOrEditEventScreen = sama ruutu sekä luontiin että muokkaukseen.
 ///
 /// MVP:
@@ -91,10 +94,9 @@ class _CreateOrEditEventScreenState extends State<CreateOrEditEventScreen> {
   Widget build(BuildContext context) {
     final isEdit = widget.initial != null;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isEdit ? 'Muokkaa tapahtumaa' : 'Luo tapahtuma'),
-      ),
+    return AppScaffold(
+      title: isEdit ? 'Muokkaa tapahtumaa' : 'Luo tapahtuma',
+      padding: EdgeInsets.zero,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(

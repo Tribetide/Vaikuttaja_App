@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../models/company.dart';
 
+// UUSI: yhteiset widgetit
+import '../widgets/app_header_card.dart';
+import '../widgets/app_section_card.dart';
+
 /// CompanyProfileScreen = yrityksen profiili “muiden silmin” (katselunäkymä).
 ///
 /// MVP:
@@ -39,14 +43,17 @@ class CompanyProfileScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _CompanyHeaderCard(
-            name: c.name,
-            location: c.location,
-            industry: c.industry,
+          // VANHA _CompanyHeaderCard -> UUSI AppHeaderCard
+          AppHeaderCard(
+            icon: Icons.apartment_outlined,
+            title: c.name,
+            subtitle: c.location,
+            meta: c.industry,
           ),
           const SizedBox(height: 12),
 
-          _SectionCard(
+          // VANHA _SectionCard -> UUSI AppSectionCard
+          AppSectionCard(
             title: 'Toimiala',
             child: Wrap(
               spacing: 8,
@@ -58,7 +65,7 @@ class CompanyProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          _SectionCard(
+          AppSectionCard(
             title: 'Lyhyt kuvaus',
             child: Text(c.description),
           ),
@@ -69,85 +76,6 @@ class CompanyProfileScreen extends StatelessWidget {
           // - Yhteystiedot (contactName/contactEmail)
           // - Linkit ja tapahtumat
         ],
-      ),
-    );
-  }
-}
-
-class _CompanyHeaderCard extends StatelessWidget {
-  const _CompanyHeaderCard({
-    required this.name,
-    required this.location,
-    required this.industry,
-  });
-
-  final String name;
-  final String location;
-  final String industry;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return SizedBox(
-      width: double.infinity,
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              const CircleAvatar(
-                radius: 26,
-                child: Icon(Icons.apartment_outlined),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(name, style: textTheme.titleLarge),
-                    const SizedBox(height: 4),
-                    Text(location, style: textTheme.bodyMedium),
-                    const SizedBox(height: 8),
-                    Text(industry, style: textTheme.bodySmall),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionCard extends StatelessWidget {
-  const _SectionCard({
-    required this.title,
-    required this.child,
-  });
-
-  final String title;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return SizedBox(
-      width: double.infinity,
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: textTheme.titleMedium),
-              const SizedBox(height: 10),
-              child,
-            ],
-          ),
-        ),
       ),
     );
   }

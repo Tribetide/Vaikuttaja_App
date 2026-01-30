@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../models/influencer.dart';
 
+// UUSI: tuo yhteiset widgetit
+import '../widgets/app_header_card.dart';
+import '../widgets/app_section_card.dart';
+
 /// ProfileScreen = vaikuttajan mediakortti (katselunäkymä).
 ///
 /// MVP:
@@ -37,27 +41,29 @@ class ProfileScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _HeaderCard(
-            name: i.name,
-            location: location,
-            primaryPlatform: i.platform,
-            followers: i.followers,
+          // VANHA _HeaderCard -> UUSI AppHeaderCard
+          AppHeaderCard(
+            icon: Icons.person_outline,
+            title: i.name,
+            subtitle: location,
+            meta: '${i.platform} • ${i.followers} seuraajaa',
           ),
           const SizedBox(height: 12),
 
-          const _SectionCard(
+          // VANHA _SectionCard -> UUSI AppSectionCard
+          const AppSectionCard(
             title: 'Minä sisällöntuottajana',
             child: Text('Tekstiä minusta'),
           ),
           const SizedBox(height: 12),
 
-          _SectionCard(
+          AppSectionCard(
             title: 'Pääkanava',
             child: Text('${i.platform} • ${i.followers} seuraajaa'),
           ),
           const SizedBox(height: 12),
 
-          const _SectionCard(
+          const AppSectionCard(
             title: 'Portfolio',
             child: Text('todo: kuvat/videot myöhemmin'),
           ),
@@ -67,88 +73,6 @@ class ProfileScreen extends StatelessWidget {
           // - yleisö & statistiikka
           // - yhteistyöpreferenssit & paketit
         ],
-      ),
-    );
-  }
-}
-
-class _HeaderCard extends StatelessWidget {
-  const _HeaderCard({
-    required this.name,
-    required this.location,
-    required this.primaryPlatform,
-    required this.followers,
-  });
-
-  final String name;
-  final String location;
-  final String primaryPlatform;
-  final int followers;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              const CircleAvatar(
-                radius: 26,
-                child: Icon(Icons.person_outline),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(name, style: Theme.of(context).textTheme.titleLarge),
-                    const SizedBox(height: 4),
-                    Text(location, style: Theme.of(context).textTheme.bodyMedium),
-                    const SizedBox(height: 8),
-                    Text(
-                      '$primaryPlatform • $followers seuraajaa',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionCard extends StatelessWidget {
-  const _SectionCard({
-    required this.title,
-    required this.child,
-  });
-
-  final String title;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return SizedBox(
-      width: double.infinity,
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: textTheme.titleMedium),
-              const SizedBox(height: 10),
-              child,
-            ],
-          ),
-        ),
       ),
     );
   }
